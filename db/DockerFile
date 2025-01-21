@@ -1,6 +1,14 @@
 FROM mysql:8
 ENV MYSQL_DATABASE=bdigne_szerveroldali
 ENV MYSQL_ROOT_PASSWORD=rootpassword
-ENV MYSQL_ALLOW_EMPTY_PASSWORD="no"
-EXPOSE 3306
-CMD ["mysqld"]
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=no
+
+# Renderhez szükséges HTTP-s szarakodás
+RUN apt-get update && apt-get install -y python3 && apt-get clean
+
+#mysql port
+EXPOSE 3306 
+#http port
+EXPOSE 8080
+
+CMD mysqld & python3 -m http.server 8080
