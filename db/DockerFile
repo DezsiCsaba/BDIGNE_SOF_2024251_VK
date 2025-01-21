@@ -1,14 +1,24 @@
-FROM mysql:8
+FROM mysql:8 AS mysql-base
 ENV MYSQL_DATABASE=bdigne_szerveroldali
 ENV MYSQL_ROOT_PASSWORD=rootpassword
 ENV MYSQL_ALLOW_EMPTY_PASSWORD=no
+EXPOSE 3306
 
-# Renderhez szükséges HTTP-s szarakodás
-RUN apt-get update && apt-get install -y python3 && apt-get clean
+# Stage 2: Lightweight HTTP Server
+FROM python:3-alpine AS http-server
+WORKDIR /app
+EXPOSE 8080
+CMD ["python3", "-m", "http.server", "8080"]
 
-#mysql port
-EXPOSE 3306 
-#http port
+# Stage 3: Final Image
+FROM mysql:8
+COPY --from=mysql-base / /
+# Install Python HTTP server from Stage 2
+COPY --from=http-server /app /app
+
+# Expose both MySQL and HTTP ports
+EXPOSE 3306
 EXPOSE 8080
 
+# Start both MySQL and HTTP server
 CMD mysqld & python3 -m http.server 8080
