@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: bdigne_szerveroldali
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+  
+  server:
+    build:
+      context: bdigne_api
+    ports:
+      - "5149:5149"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - db
+    networks:
+      - app-network
+  webapp:
+    build:
+      context: bdigne-web
+      dockerfile: DockerFile #e nélkül valamiért nem akarja az igazat. Ehhez a fixhez kellett egy 30 perc :D
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    environment:
+      - VITE_API_URL=http://server:5149
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:

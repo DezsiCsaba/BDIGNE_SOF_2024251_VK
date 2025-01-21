@@ -11,7 +11,9 @@ const MAX_RETRIES = 3;
 // isLog && console.log('API_URL', process.env.API_URL)
 // const api = axios.create({baseURL: process.env.API_URL})
 
-const api = axios.create({baseURL: 'http://localhost:5149/'})
+const apiBaseUrl = import.meta.env.VITE_API_URL;
+// const api = axios.create({baseURL: 'http://localhost:5149/'})
+const api = axios.create({baseURL: apiBaseUrl})
 
 export default boot(({app}) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
