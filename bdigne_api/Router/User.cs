@@ -32,6 +32,41 @@ public static class User
 
             return Results.Unauthorized();
         });
-        
+
+        app.MapPost("/register",
+            async (
+                HttpContext httpContext,
+                [FromServices] IGenericServiceCrud<Db.Models.User> userService,
+                [FromBody] UserRegisterDto userReg
+            ) =>
+            {
+                if (httpContext.Request.Headers.TryGetValue("X-User-Role", out var userRole))
+                {
+                    if (userRole != "Admin" && userRole != "SiteDeveloper")
+                    {
+                        return Results.Unauthorized();
+                    }
+                }
+                await Controller.User.RegisterUser(userReg.GetUserObject(userReg), userService);
+                return Results.Ok();
+            }).RequireAuthorization();
+
+        app.MapGet("users/get/all",
+            async (
+                HttpContext httpContext,
+                [FromServices] IGenericServiceCrud<Db.Models.User> userService
+            ) =>
+            {
+                if (httpContext.Request.Headers.TryGetValue("X-User-Role", out var userRole))
+                {
+                    if (userRole != "Admin" && userRole != "SiteDeveloper")
+                    {
+                        return Results.Unauthorized();
+                    }
+                }
+
+                var result = await Controller.User.GetAll(userService);
+                return Results.Ok(result);
+            }).RequireAuthorization();
     }
 }

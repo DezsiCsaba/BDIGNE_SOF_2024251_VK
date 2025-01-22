@@ -49,15 +49,30 @@ builder.Services.AddAuthentication(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration[issuer],
-            ValidAudience = builder.Configuration[issuer],
+            ValidateIssuerSigningKey = false,
+            // ValidIssuer = builder.Configuration[issuer],
+            // ValidAudience = builder.Configuration[issuer],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token validated successfully.");
+                return Task.CompletedTask;
+            }
+        };
     });
+builder.Services.AddAuthorization();
 #endregion
 
 #region custom service registration
@@ -79,7 +94,7 @@ var app = builder.Build();
 app.UseMiddleware<GlobalErorhandler>();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthorization();
 #endregion 
 
 #region routers

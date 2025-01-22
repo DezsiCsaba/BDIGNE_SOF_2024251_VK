@@ -13,6 +13,7 @@ namespace bdigne_api.Services.AuthService;
 public class AuthService: IAuthService
 {
     private readonly string _secretKey;
+    private readonly string _issuer;
     private readonly ApplicationDbContext _dbContext;
     private readonly IGenericService<bdigne_api.Db.Models.User> _userService;
 
@@ -21,10 +22,10 @@ public class AuthService: IAuthService
         // _secretKey = configuration["AppSettings:JWT:Key"];
         var jwtSettings = configuration.GetSection("JWT");
         _secretKey = jwtSettings["Key"];
+        _issuer = jwtSettings["Issuer"];
         _dbContext = dbContext;
         _userService = userService;
     }
-    
 
 
     public async Task<Object> GenerateToken(string username)
@@ -74,6 +75,8 @@ public class AuthService: IAuthService
                     new Claim(ClaimTypes.Name, UserName)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = _issuer,
+                Audience = _issuer,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

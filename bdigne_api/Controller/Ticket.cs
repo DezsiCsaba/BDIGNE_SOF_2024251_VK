@@ -65,5 +65,12 @@ public static class Ticket
         activity.CreatedAt = DateTime.Now;
         await activityService.CreateAsync(activity);
     }
+
+    public static async Task CreateTicket(
+        Db.Models.Ticket ticket,
+        IGenericServiceCrud<Db.Models.Ticket> ticketService)
+    {
+        await ticketService.CreateAsync(ticket);
+    }
     
 }

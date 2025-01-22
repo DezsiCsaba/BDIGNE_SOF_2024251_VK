@@ -25,4 +25,19 @@ public static class User
 
         return user;
     }
+
+    public static async Task RegisterUser(
+        Db.Models.User user,
+        IGenericServiceCrud<Db.Models.User> userService)
+    {
+        await userService.CreateAsync(user);
+    }
+
+    public static async Task<Object> GetAll(IGenericServiceCrud<Db.Models.User> crudService)
+    {
+        return new
+        {
+            users = await crudService.GetAllAsync()
+        };
+    }
 }
