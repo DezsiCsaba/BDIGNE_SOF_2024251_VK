@@ -48,5 +48,14 @@ export const useTicketStore = defineStore('ticket', {
         data: payload
       })
     },
+
+    async create(payload){
+      console.log('create', payload)
+      await api({
+        method: 'post',
+        url: '/ticket/create',
+        data: payload
+      })
+    }
   },
 })

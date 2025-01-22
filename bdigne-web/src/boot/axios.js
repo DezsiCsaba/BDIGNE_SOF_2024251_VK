@@ -30,6 +30,9 @@ export default boot(({app}) => {
 api.interceptors.request.use(config => {
   isLog && console.log('api-------config', config);
   config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
+  if (localStorage.getItem('userData')){
+    config.headers['X-User-Role'] = getUserRole() || ''
+  }
   if (config.isLoading !== false) {
     // Loading.show({
     //   delay: 200 // ms
@@ -158,6 +161,9 @@ createAuthRefreshInterceptor(api, refreshAuthLogic, {
 // Obtain the fresh token each time the function is called
 function getAccessToken() {
   return localStorage.getItem('token');
+}
+function getUserRole() {
+  return JSON.parse(localStorage.getItem('userData'))['role'] || ''
 }
 
 // Use interceptor to inject the token to requests

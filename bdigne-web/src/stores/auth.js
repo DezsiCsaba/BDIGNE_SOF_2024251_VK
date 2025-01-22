@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: '',
     userData: {},
+    users: []
   }),
   actions: {
     async auth(payload) {
@@ -21,5 +22,22 @@ export const useAuthStore = defineStore('auth', {
       LocalStore.storeToken(this.token)
       LocalStore.storeUserData(this.userData)
     },
+
+    async register(payload){
+      console.log('register', payload)
+      await api({
+        method: 'post',
+        url: 'register',
+        data: payload
+      })
+    },
+
+    async getAll(){
+      const res = await api({
+        method: 'get',
+        url: 'users/get/all'
+      })
+      this.users = res.data.users
+    }
   },
 })
